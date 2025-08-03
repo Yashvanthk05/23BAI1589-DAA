@@ -13,8 +13,6 @@ class Data{
   string name,department;
 };
 
-string OUTPUT_DIR="../dataset/";
-
 void merge(vector<Data> &arr,int low,int mid,int high){
   int n=(high-low+1);
   int i=low,j=mid+1;
@@ -90,3 +88,4 @@ int main(int argc,char* argv[]){
   sorting(argv[1]);
   return 0;
 }
+

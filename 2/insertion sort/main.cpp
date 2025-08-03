@@ -13,9 +13,6 @@ class Data{
   string name,department;
 };
 
-string OUTPUT_DIR="../dataset/";
-
-
 void insertion_sort(vector<Data> &arr){
   for(int i=1;i<arr.size();i++){
     Data key=arr[i];
@@ -73,3 +70,4 @@ int main(int argc,char* argv[]){
   sorting(argv[1]);
   return 0;
 }
+
