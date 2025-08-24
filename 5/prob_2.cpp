@@ -1,72 +1,70 @@
-#include<iostream>
-#include<vector>
-#include<unordered_map>
-#include<algorithm>
+#include <iostream>
+#include <vector>
+#include <algorithm>
 using namespace std;
 
-int rodCutttingRecTopDown(vector<int> &arr,int length,int cost){
-  if(length==0) return 0;
-  int max_val=INT_MIN;
-  for(int i=1;i<=length;i++){
-    int val=arr[i-1]+rodCutttingRecTopDown(arr,length-i,cost);
-    if(i!=length) val-=cost;
-    max_val=max(max_val,val);
-  }
-  return max_val;
-}
-
-int rodCuttingMemo(vector<int> &arr,int length,int cost,unordered_map<int,int> &dp){
-  if(length==0) return 0;
-  if(dp.count(length)) return dp[length];
-  int max_val=INT_MIN;
-  for(int i=1;i<=length;i++){
-    int val=arr[i-1]+rodCuttingMemo(arr,length-i,cost,dp);
-    if(i!=length) val-=cost;
-    max_val=max(max_val,val);
-  }
-  return dp[length]=max_val;
-}
-
-int rodCuttingBottomUp(vector<int> &arr,int length,int cost){
-  vector<int> dp(length+1,0);
-  vector<int> cuts(length+1,0);
-  for(int i=1;i<=length;i++){
-    int max_val=INT_MIN;
-    for(int j=1;j<=i;j++){
-      int val=arr[j-1]+dp[i-j];
-      if(j!=i) val-=cost;
-      if(val>max_val){
-        max_val=val;
-        cuts[i]=j;
-      }
+int rodCutRecTopDown(vector<int> &arr,int c,int cost) {
+    if (c==0) return 0;
+    int m=INT_MIN;
+    for (int i=1;i<=c;i++){
+        int v=arr[i-1]+rodCutRecTopDown(arr,c-i,cost);
+        if (i!=c) v-=cost;
+        m=max(m,v);
     }
-    dp[i]=max_val;
-  }
-  int temp=length;
-  cout<<"(Cuts: ";
-  while(temp>0){
-    cout<<cuts[temp]<<" ";
-    temp-=cuts[temp];
-  }
-  cout<<") ";
-  return dp[length];
+    return m;
 }
 
-int main(){
-  int n;
-  cin>>n;
-  vector<int> arr(n);
-  for(int i=0;i<n;i++) {
-    cin>>arr[i];
-  }
-  int length,costcut;
-  cout<<"Rod Length: ";
-  cin>>length;
-  cout<<"Cutting Cost: ";
-  cin>>costcut;
-  cout<<"Recursive Top-Down Revenue: "<<rodCutttingRecTopDown(arr,length,costcut)<<endl;
-  unordered_map<int,int> dp;
-  cout<<"Memoized Top-Down Revenue: "<<rodCuttingMemo(arr,length,costcut,dp)<<endl;
-  cout<<"Extended Bottom-Up Revenue: "<<rodCuttingBottomUp(arr,length,costcut)<<endl;
-  return 0;
+int rodCutMemo(vector<int> &arr,int c,int cost,vector<int> &dp) {
+    if(c==0) return 0;
+    if (dp[c]!=-1) return dp[c];
+    int m=INT_MIN;
+    for (int i=1;i<=c;i++){
+        int v=arr[i-1]+rodCutMemo(arr,c-i,cost,dp);
+        if(i!=c) v-=cost;
+        m=max(m, v);
+    }
+    return dp[c]=m;
+}
+
+int rodCutBottomUp(vector<int> &arr,int c,int cost) {
+    vector<int> dp(c+1,0);
+    vector<int> cut(c+1,0);
+    for (int i=1;i<=c;i++) {
+        int m=INT_MIN;
+        for (int j=1;j<=i;j++) {
+            int v=arr[j-1]+dp[i-j];
+            if (j!=i) v-=cost;
+            if (v>m) {
+                m=v;
+                cut[i]=j;
+            }
+        }
+        dp[i]=m;
+    }
+
+    int t=c;
+    cout<<"(Cuts: ";
+    while(t>0){
+        cout<<cut[t]<<" ";
+        t-=cut[t];
+    }
+    cout<<") ";
+    return dp[c];
+}
+
+int main() {
+    int n;
+    cin>>n;
+    vector<int> arr(n);
+    for (int i=0;i<n;i++) cin>>arr[i];
+    int length,cost;
+    cout<<"Rod Length: ";
+    cin>>length;
+    cout<<"Cutting Cost: ";
+    cin>>cost;
+    cout<<"Recursive Top-Down Revenue: "<<rodCutRecTopDown(arr,length,cost)<<endl;
+    vector<int> dp(length+1,-1);
+    cout<<"Memoized Top-Down Revenue: "<<rodCutMemo(arr,length,cost,dp)<<endl;
+    cout<<"Extended Bottom-Up Revenue: "<<rodCutBottomUp(arr,length,cost)<<endl;
+    return 0;
 }
