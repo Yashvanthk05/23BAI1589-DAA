@@ -1,50 +1,54 @@
 #include<iostream>
+#include<vector>
 #include<string>
 #include<cmath>
 using namespace std;
 
-int computeHash(string text,int length,int d,int q){
-  int h=0;
-  for(int i=0;i<length;i++){
-    h=(h*d+text[i])%q;
-  }
-  return h;
-}
+const int d = 256;
+const int q = 101;
 
-void rabinKarp(string text,string pattern,int d,int q){
-  int n=text.length();
-  int m=pattern.length();
-  int h=1;
-  for(int i=0;i<m-1;i++){
-    h=(h*d)%q;
-  }
-  int partial_k=ceil(2*m/3);
-  int tHash=computeHash(text,m,d,q);
-  int pHash=computeHash(pattern,m,d,q);
-  for(int s=0;s<=n-m;s++){
-    if(tHash==pHash && text.substr(s,m)==pattern){
-      cout<<"Full shift: "<<s<<endl;
-      cout<<"Parital shift: (s="<<s<<", k="<<m<<")"<<endl;
-    }else{
-      for(int k=partial_k;k<=m;k++){
-        int pPartialHash=computeHash(pattern,k,d,q);
-        int tPartialHash=computeHash(text.substr(s,k),k,d,q);
-        if(pPartialHash==tPartialHash && text.substr(s,k)==pattern.substr(0,k)){
-          cout<<"Parital shift: ("<<s<<","<<k<<")"<<endl;
+vector<pair<int,int>> Rabin_Karp_Partial(string &T,string &P) {
+    int n = T.size();
+    int m = P.size();
+    vector<pair<int,int>> partialShifts;
+    int klimit=ceil(2*m+2)/3;
+    int pHash = 0, tHash = 0, h = 1;
+    for (int i=0;i<m-1;i++)
+        h=(h*d)%q;
+    for(int i=0;i<m;i++) {
+        pHash=(d*pHash+P[i])%q;
+        tHash=(d*tHash+T[i])%q;
+    }
+    for(int s=0;s<=n-m;s++){
+        if(pHash==tHash){
+            if(T.substr(s,m)==P){
+                cout<<"Fully valid shift at "<<s<<endl;
+            }
+        }    
+        for(int k=m-1;k>=klimit;--k){
+            if(s+k<=n && P.substr(0, k)==T.substr(s,k)){
+                partialShifts.push_back({s,k});
+                break;
+            }
         }
-      }
+        if(s<n-m){
+            tHash=(d*(tHash-T[s]*h)+T[s+m])% q;
+            if(tHash<0) tHash+=q;
+        }
     }
-    if(s<n-m){
-      tHash=(d*(tHash-text[s]*h)+text[s+m])%q;
-      if(tHash<0) tHash+=q;
-    }
-  }
+    return partialShifts;
 }
 
 int main(){
-  string text,pattern;
-  cin>>text>>pattern;
-  int d=256;
-  int q=101;
-  rabinKarp(text,pattern,d,q);
+    string T="abcdeabcfabc";
+    string P="abc";
+    cout<<"Text = "<<T<<endl;
+    cout<<"Pattern = "<<P<<endl;
+    vector<pair<int,int>> partials=Rabin_Karp_Partial(T,P);
+    cout<<"Partially valid shifts (shift, k): ";
+    for(pair<int,int> x: partials){
+        cout<<"("<<x.first<<", "<<x.second<<") ";
+    }
+    cout<<endl;
+    return 0;
 }
