@@ -13,7 +13,6 @@ int main(){
   for(int i=0;i<m;i++){
     cin>>u>>v>>w;
     arr[u][v]=min(arr[u][v],w);
-    arr[v][u]=min(arr[v][u],w);
   }
   for(int k=1;k<=n;k++){
     for(int i=1;i<=n;i++){
@@ -33,3 +32,4 @@ int main(){
   cout<<res;
   return 0;
 }
+
